@@ -1,0 +1,92 @@
+#include <LiquidCrystal.h>
+const int rs =8, en =9, d4 =10, d5 =11, d6 =12, d7 =13;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+int smoke=A1;
+int ef=6;
+int buz=7;
+int light=2;
+int fan=3;
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(fan,OUTPUT);
+  pinMode(light,OUTPUT);
+  pinMode(buz,OUTPUT);
+  pinMode(ef,OUTPUT);
+  pinMode(smoke,INPUT);
+    Serial.begin(9600);
+  digitalWrite(buz,0);
+  lcd.begin(16, 2);
+  lcd.print("  WELCOME");
+  delay(1500);
+  lcd.clear();
+  Serial.println("AT");
+  delay(1500);
+  Serial.println("AT+CMGF=1");
+  pinMode(buz,OUTPUT);
+  digitalWrite(buz,0);
+}
+
+void loop()
+{  
+  int smk=analogRead(smoke)/1.5;
+  Serial.println(smk);
+  delay(500);
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("SMOKE:" + String(smk));
+  //   lcd.setCursor(0,1);
+  //  lcd.print("Z:" + String(z_adc_value));
+    delay(100);
+    if(smk>150)
+    {
+       digitalWrite(buz,1);
+      digitalWrite(light,0);
+      digitalWrite(fan,0);
+      digitalWrite(ef,0);
+      send_sms(1);
+      delay(100);
+    }
+    else
+    {
+     
+      digitalWrite(light,1);
+      digitalWrite(fan,1);
+      digitalWrite(ef,1);  
+      digitalWrite(buz,0);  
+    }
+   }   
+void send_sms(int sts)
+{
+Serial.println("Sending SMS...");
+Serial.println("AT");    
+delay(1000);  
+Serial.println("ATE0");    
+delay(1000);  
+Serial.println("AT+CMGF=1");    
+delay(1000);  
+Serial.print("AT+CMGS=\"8374266185\"\r\n");// Replace x with mobile number
+delay(1000);
+if(sts==1)
+Serial.println("SOS:SMOKE DETCTED TAKE NECESSARY ACTIONS");
+//Serial.println("https://www.google.com/maps/search/?api=1&query=" + String(flat,6)+ "," + String(flon,6));
+//gsm_Serial.println("https://www.google.com/maps/search/?api=1&query=" + String(flat,6)+ "," + String(flon,6));
+delay(100);
+Serial.println((char)26);// ASCII code of CTRL+Z
+delay(6000);
+Serial.println("AT");    
+delay(1000);  
+Serial.println("ATE0");    
+delay(1000);  
+Serial.println("AT+CMGF=1");    
+delay(1000);  
+Serial.print("AT+CMGS=\"7780283056\"\r\n");// Replace x with mobile number
+delay(1000);
+if(sts==1)
+Serial.println("SOS:SMOKE DETCTED TAKE NECESSARY ACTIONS");
+//Serial.println("https://www.google.com/maps/search/?api=1&query=" + String(flat,6)+ "," + String(flon,6));
+//gsm_Serial.println("https://www.google.com/maps/search/?api=1&query=" + String(flat,6)+ "," + String(flon,6));
+delay(100);
+Serial.println((char)26);// ASCII code of CTRL+Z
+delay(2000);
+}
